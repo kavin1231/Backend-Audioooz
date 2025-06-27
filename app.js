@@ -35,6 +35,6 @@ connection.once("open", () => {
 
 app.use("/api/users", userRouter);
 
-app.listen(3006, () => {
-  console.log("Server is runing on port 3006");
+app.listen(3005, () => {
+  console.log("Server is runing on port 3005");
 });
