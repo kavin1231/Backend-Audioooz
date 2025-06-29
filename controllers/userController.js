@@ -45,7 +45,7 @@ export function loginUser(req, res) {
             profilePicture: user.profilePicture,
             phone: user.phone,
           },
-          "AudioMart 77"
+          process.env.JWT_SECRET,
         );
 
         res.json({ message: "Login successful", token: token , user: user});
