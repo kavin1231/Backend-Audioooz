@@ -3,12 +3,23 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import userRouter from "./routes/userRouter.js";
 import productRouter from "./routes/productRouter.js";
+import jwt from "jsonwebtoken";
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use((req, res, next) => {
-  console.log("Request is here");
+  const token = req.header("Authorization");
+  if (token != null) {
+    token = token.replace("Bearer ", "");
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (!err) {
+        req.user = decoded;
+      }
+    });
+  }
+  next();
 });
 
 let mongoUrl = process.env.MONGO_URL;
