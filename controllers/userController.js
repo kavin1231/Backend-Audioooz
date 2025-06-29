@@ -12,7 +12,7 @@ export function registerUser(req, res) {
   const newUser = new User(data);
 
   newUser
-    .save()
+    .save() 
     .then(() => {
       res.json({ message: "User registered successfully" });
     })
