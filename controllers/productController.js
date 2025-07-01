@@ -1,8 +1,6 @@
 import Product from "../models/product.js";
 
 export function addProduct(req, res) {
-  console.log(req.user);
-
   if (req.user == null) {
     res.status(401).json({
       message: "Please login and try again",
@@ -30,10 +28,23 @@ export function addProduct(req, res) {
 }
 
 export async function getProducts(req, res) {
+  let isAdmin = false;
+  if (req.user != null) {
+    if (req.user.role === "admin") {
+      isAdmin = true;
+    }
+  }
   try {
     const products = await Product.find();
-    res.json(products);
+    if (isAdmin) {
+      res.json(products);
+      return;
+    } else {
+      const products = await Product.find({ availability: true });
+      res.json(products);
+      return;
+    }
   } catch (error) {
-    res.status(500).json({ error: "Failed to get products" });
+    res.status(500).json({ error: "Failed to fetch products" });
   }
 }
