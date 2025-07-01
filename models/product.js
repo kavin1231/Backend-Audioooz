@@ -25,10 +25,12 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
+    default: "uncategorized",
   },
   subcategory: {
     type: String,
     required: true,
+    default: "uncategorized",
   },
   dimensions: {
     type: String,
