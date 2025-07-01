@@ -1,4 +1,5 @@
 import Product from "../models/product.js";
+import { isItAdmin } from "./userController.js";
 
 export function addProduct(req, res) {
   if (req.user == null) {
@@ -43,13 +44,27 @@ export async function getProducts(req, res) {
   }
 }
 
-function isItAdmin(req) {
-  let isAdmin = false;
+export async function updateProduct(req, res) {
+  try {
+    if(isItAdmin(req)) {
+      const key = req.params.key;
+      const data = req.body;
+      await Product.updateOne({ key: key }, 
+        data);
+      res.json({ message: "Product updated successfully" });
 
-  if (req.user != null) {
-    if (req.user.role === "admin") {
-      isAdmin = true;
+  
+
+    }else {
+      res.status(401).json({
+        message: "You are not authorized to update products",
+      });
+      return;
     }
+      
+
+
+  } catch (error) {
+
   }
-  return isAdmin;
 }
