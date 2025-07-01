@@ -31,6 +31,8 @@ export function getReviews(req, res) {
   if (user == null || user.role !== "admin") {
     Review.find({ isApproved: true }).then((reviews) => {
       res.json(reviews);
+    }).catch((error) => {
+      res.status(500).json({ error: "Failed to fetch reviews" });   
     });
     return;
   }
