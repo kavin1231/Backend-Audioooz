@@ -110,6 +110,9 @@ export async function updateInquiry(req, res) {
                     return;
                 }
             }
+        }else {
+            res.status(403).json({ message: "You are not authorized to update inquiries" });
+            return;
         }
 
     } catch (error) {
