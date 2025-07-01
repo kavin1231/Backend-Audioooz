@@ -29,10 +29,9 @@ export function addReview(req, res) {
 export function getReviews(req, res) {
   const user = req.user;
   if (user == null || user.role !== "admin") {
-    Review.find({ isApproved: true })
-      .then((reviews) => {
-        res.json(reviews);
-        })
+    Review.find({ isApproved: true }).then((reviews) => {
+      res.json(reviews);
+    });
     return;
   }
   if (user.role === "admin") {
@@ -45,4 +44,66 @@ export function getReviews(req, res) {
       });
   }
 }
+export function deleteReview(req, res) {
+  const email = req.params.email;
 
+  if (req.user == null) {
+    res.status(401).json({
+      message: "Please login and try again",
+    });
+    return;
+  }
+  if (req.user.role !== "admin") {
+    Review.deleteOne({ email: email })
+      .then(() => {
+        res.json({ message: "Review deleted successfully" });
+      })
+      .catch((error) => {
+        res.status(500).json({ error: "Failed to delete review" });
+      });
+    return;
+  }
+  if (req.user.role === "customer") {
+    if (req.user.email == email) {
+      Review.deleteOne({ email: email })
+        .then(() => {
+          res.json({ message: "Review deleted successfully" });
+        })
+        .catch((error) => {
+          res.status(500).json({ error: "Failed to delete review" });
+        });
+    }
+  } else {
+    res.status(401).json({
+      message: "You are not authorized to delete this review",
+    });
+    return;
+  }
+}
+
+export function approveReview(req, res) {
+  const email = req.params.email;
+
+  if (req.user == null) {
+    res.status(401).json({
+      message: "Please login and try again",
+    });
+    return;
+  }
+  if (req.user.role !== "admin") {
+    res.status(401).json({
+      message: "You are not authorized to approve reviews",
+    });
+    return;
+  }
+  if (req.user.role === "admin") {
+    Review.updateOne({email:email}, {isApproved: true})
+      .then(() => {
+        res.json({ message: "Review approved successfully" });
+      })
+      .catch((error) => {
+        res.status(500).json({ error: "Failed to approve review" });
+      });
+    return;
+  }
+}
