@@ -26,25 +26,19 @@ export function addReview(req, res) {
     });
 }
 
-export function getReviews(req, res) {
-  const user = req.user;
-  if (user == null || user.role !== "admin") {
-    Review.find({ isApproved: true }).then((reviews) => {
+export async function getReviews(req, res) {
+ const user= req.user;
+  try {
+    if(user.role === "admin") {
+      const reviews = await Review.find();
       res.json(reviews);
-    }).catch((error) => {
-      res.status(500).json({ error: "Failed to fetch reviews" });   
-    });
-    return;
-  }
-  if (user.role === "admin") {
-    Review.find({})
-      .then((reviews) => {
-        res.json(reviews);
-      })
-      .catch((error) => {
-        res.status(500).json({ error: "Failed to fetch reviews" });
-      });
-  }
+    }else {
+      const reviews = await Review.find({ isApproved: true });
+      res.json(reviews);
+    }   
+    } catch (error) {
+    res.status(500).json({ error: "Failed to fetch reviews" });
+    }
 }
 export function deleteReview(req, res) {
   const email = req.params.email;
