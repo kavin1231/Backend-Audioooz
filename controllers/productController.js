@@ -28,15 +28,9 @@ export function addProduct(req, res) {
 }
 
 export async function getProducts(req, res) {
-  let isAdmin = isItAdmin(req);
-  if (req.user != null) {
-    if (req.user.role === "admin") {
-      isAdmin = true;
-    }
-  }
   try {
     const products = await Product.find();
-    if (isAdmin) {
+    if (isItAdmin(req)) {
       res.json(products);
       return;
     } else {
@@ -54,7 +48,7 @@ function isItAdmin(req) {
 
   if (req.user != null) {
     if (req.user.role === "admin") {
-      isAdmin=true;
+      isAdmin = true;
     }
   }
   return isAdmin;
