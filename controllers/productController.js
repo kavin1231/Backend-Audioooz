@@ -28,7 +28,7 @@ export function addProduct(req, res) {
 }
 
 export async function getProducts(req, res) {
-  let isAdmin = false;
+  let isAdmin = isItAdmin(req);
   if (req.user != null) {
     if (req.user.role === "admin") {
       isAdmin = true;
@@ -47,4 +47,15 @@ export async function getProducts(req, res) {
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch products" });
   }
+}
+
+function isItAdmin(req) {
+  let isAdmin = false;
+
+  if (req.user != null) {
+    if (req.user.role === "admin") {
+      isAdmin=true;
+    }
+  }
+  return isAdmin;
 }
