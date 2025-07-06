@@ -16,7 +16,7 @@ app.use(cors());
 
 app.use(bodyParser.json());
 app.use((req, res, next) => {
-  const token = req.header("Authorization");
+  let token = req.header("Authorization");
   if (token != null) {
     token = token.replace("Bearer ", "");
 
