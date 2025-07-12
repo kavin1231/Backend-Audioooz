@@ -4,15 +4,16 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
 dotenv.config();
+
+// Register a new user
 export function registerUser(req, res) {
   const data = req.body;
 
   data.password = bcrypt.hashSync(data.password, 10);
-  //#
   const newUser = new User(data);
 
   newUser
-    .save() 
+    .save()
     .then(() => {
       res.json({ message: "User registered successfully" });
     })
@@ -21,19 +22,15 @@ export function registerUser(req, res) {
     });
 }
 
+// Login a user
 export function loginUser(req, res) {
   const data = req.body;
 
-  User.findOne({
-    email: data.email,
-  }).then((user) => {
+  User.findOne({ email: data.email }).then((user) => {
     if (user == null) {
       res.status(404).json({ error: "User not found" });
     } else {
-      const isPasswordCorrect = bcrypt.compareSync(
-        data.password,
-        user.password
-      );
+      const isPasswordCorrect = bcrypt.compareSync(data.password, user.password);
 
       if (isPasswordCorrect) {
         const token = jwt.sign(
@@ -45,39 +42,51 @@ export function loginUser(req, res) {
             profilePicture: user.profilePicture,
             phone: user.phone,
           },
-          process.env.JWT_SECRET,
+          process.env.JWT_SECRET
         );
 
-        res.json({ message: "Login successful", token: token , user: user});
+        res.json({ message: "Login successful", token: token, user: user });
       } else {
         res.status(401).json({ error: "Login failed" });
       }
     }
-  }); 
+  });
 }
 
+// Get a single user by ID
+export function getUser(req, res) {
+  const userId = req.params.id;
 
-export function isItAdmin(req){
-  let isAdmin = false;
-
-  if(req.user != null){
-    if(req.user.role == "admin"){
-      isAdmin = true;
-    }
-  }
-
-  return isAdmin;
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        res.status(404).json({ error: "User not found" });
+      } else {
+        res.json(user);
+      }
+    })
+    .catch((error) => {
+      res.status(500).json({ error: "Failed to retrieve user" });
+    });
 }
 
-export function isItCustomer(req){
-  let isCustomer = false;
-
-  if(req.user != null){
-    if(req.user.role == "customer"){
-      isCustomer = true;
-    }
-  }
-
-  return isCustomer;
+// Get all users
+export function getAllUsers(req, res) {
+  User.find()
+    .then((users) => {
+      res.json(users);
+    })
+    .catch((error) => {
+      res.status(500).json({ error: "Failed to retrieve users" });
+    });
 }
 
+// Check if user is admin
+export function isItAdmin(req) {
+  return req.user != null && req.user.role === "admin";
+}
+
+// Check if user is customer
+export function isItCustomer(req) {
+  return req.user != null && req.user.role === "customer";
+}
