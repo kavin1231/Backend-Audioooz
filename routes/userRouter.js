@@ -1,17 +1,35 @@
-// routes/userRoutes.js
 import express from "express";
 import {
-  registerUser,
-  loginUser,
-  getUser,
   getAllUsers,
+  getUser,
+  loginUser,
+  loginWithGoogle,
+  registerUser,
+  updateUser,
+  deleteUser,
+  updateProfile,
+  deleteAccount,
+  getUsersByRole,
+  changePassword,
+  uploadProfilePicture,
+  getProfile,
 } from "../controllers/userController.js";
 
-const router = express.Router();
+const userRouter = express.Router();
 
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-router.get("/", getUser); // GET single user by ID
-router.get("/all", getAllUsers); // GET all users
+userRouter.post("/", registerUser);
+userRouter.post("/login", loginUser);
+userRouter.get("/all", getAllUsers);
 
-export default router;
+userRouter.put("/update/:id", updateUser);
+userRouter.delete("/delete/:id", deleteUser);
+userRouter.put("/profile", updateProfile);
+userRouter.delete("/profile", deleteAccount);
+userRouter.post("/google", loginWithGoogle);
+userRouter.get("/profile", getProfile);
+userRouter.get("/getUsersByRole/:role", getUsersByRole);
+userRouter.get("/", getUser);
+userRouter.post("/upload-profile-picture", uploadProfilePicture);
+userRouter.post("/change-password", changePassword);
+
+export default userRouter;
