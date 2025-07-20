@@ -47,10 +47,7 @@ app.use((req, res, next) => {
 // ✅ MONGO CONNECTION
 let mongoUrl = process.env.MONGO_URL;
 
-mongoose.connect(mongoUrl, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(mongoUrl);
 
 const connection = mongoose.connection;
 connection.once("open", () => {
