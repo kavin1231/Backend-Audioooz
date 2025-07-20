@@ -139,7 +139,7 @@ export async function getQuote(req, res) {
 export async function updateOrder(req, res) {
   if (!isItAdmin(req)) {
     return res.status(403).json({
-      message: "Only Admins can update orders",
+      message: "Only farmers can update orders",
     });
   }
 
@@ -178,3 +178,4 @@ export async function updateOrder(req, res) {
     res.status(500).json({ message: error.message });
   }
 }
+
