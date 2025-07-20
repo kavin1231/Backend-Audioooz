@@ -172,6 +172,68 @@ export async function loginWithGoogle(req, res) {
     res.status(500).json({ error: "Failed to login with google" });
   }
 }
+export async function loginWithGoogle(req, res) {
+	//https://www.googleapis.com/oauth2/v3/userinfo
+	const accesToken = req.body.accessToken;
+	console.log(accesToken);
+	try {
+		const response = await axios.get(
+			"https://www.googleapis.com/oauth2/v3/userinfo",
+			{
+				headers: {
+					Authorization: `Bearer ${accesToken}`,
+				},
+			}
+		);
+		console.log(response.data);
+		const user = await User.findOne({
+			email: response.data.email,
+		});
+		if (user != null) {
+			const token = jwt.sign(
+				{
+					firstName: user.firstName,
+					lastName: user.lastName,
+					email: user.email,
+					role: user.role,
+					profilePicture: user.profilePicture,
+					phone: user.phone,
+          emailVerified: true
+				},
+				process.env.JWT_SECRET
+			);
+
+			res.json({ message: "Login successful", token: token, user: user });
+		} else {
+      const newUser = new User({
+        email: response.data.email,
+        password: "123",
+        firstName: response.data.given_name,
+        lastName: response.data.family_name,
+        address: "Not Given",
+        phone: "Not given",
+        profilePicture: response.data.picture,
+        emailVerified: true,
+      });
+      const savedUser = await newUser.save();
+      const token = jwt.sign(
+        {
+          firstName: savedUser.firstName,
+          lastName: savedUser.lastName,
+          email: savedUser.email,
+          role: savedUser.role,
+          profilePicture: savedUser.profilePicture,
+          phone: savedUser.phone,
+        },
+        process.env.JWT_SECRET
+      );
+      res.json({ message: "Login successful", token: token, user: savedUser });
+		}
+	} catch (e) {
+		console.log(e);
+		res.status(500).json({ error: "Failed to login with google" });
+	}
+}
 
 export async function getProfile(req, res) {
   if (req.user == null) {
