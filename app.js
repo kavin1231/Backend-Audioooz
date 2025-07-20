@@ -17,7 +17,10 @@ const app = express();
 
 // ✅ CORS CONFIGURATION
 const allowedOrigins = [
-  "https://frontend-audioooz-qbi8gtr2o-kavins-projects-839c40b0.vercel.app"
+  "https://frontend-audioooz.vercel.app",                                    // Main domain
+  "https://frontend-audioooz-git-main-kavins-projects-839c40b0.vercel.app", // Git branch domain
+  "https://frontend-audioooz-asietl5zm-kavins-projects-839c40b0.vercel.app", // Deployment-specific domain
+  "http://localhost:3005",                                                   // Local development
 ];
 
 app.use(
