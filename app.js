@@ -23,12 +23,20 @@ const allowedOrigins = [
   "http://localhost:3005",                                                   // Local development
 ];
 
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, postman)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // ✅ Handle preflight requests
 
 // ✅ BODY PARSER
 app.use(bodyParser.json());
@@ -50,7 +58,10 @@ app.use((req, res, next) => {
 // ✅ MONGO CONNECTION
 let mongoUrl = process.env.MONGO_URL;
 
-mongoose.connect(mongoUrl);
+mongoose.connect(mongoUrl, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 const connection = mongoose.connection;
 connection.once("open", () => {
@@ -65,6 +76,7 @@ app.use("/api/inquiries", inquiryRouter);
 app.use("/api/orders", orderRouter);
 
 // ✅ START SERVER
-app.listen(3005, () => {
-  console.log("Server is running on port 3005");
+const PORT = process.env.PORT || 3005;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
