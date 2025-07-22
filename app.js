@@ -17,26 +17,28 @@ const app = express();
 
 // ✅ CORS CONFIGURATION
 const allowedOrigins = [
-  "https://frontend-audioooz.vercel.app",                                    // Main domain
-  "https://frontend-audioooz-git-main-kavins-projects-839c40b0.vercel.app", // Git branch domain
-  "https://frontend-audioooz-asietl5zm-kavins-projects-839c40b0.vercel.app", // Deployment-specific domain
-  "http://localhost:3005",                                                   // Local development
+  "https://frontend-audioooz.vercel.app",                                     // Remove trailing slash
+  "https://frontend-audioooz-git-main-kavins-projects-839c40b0.vercel.app",
+  "https://frontend-audioooz-asietl5zm-kavins-projects-839c40b0.vercel.app",
+  "http://localhost:3005",
 ];
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl, postman)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-};
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // ✅ Handle preflight requests
+// ✅ Handle preflight OPTIONS requests
+app.options("*", cors());
 
 // ✅ BODY PARSER
 app.use(bodyParser.json());
@@ -56,13 +58,7 @@ app.use((req, res, next) => {
 });
 
 // ✅ MONGO CONNECTION
-let mongoUrl = process.env.MONGO_URL;
-
-mongoose.connect(mongoUrl, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
+mongoose.connect(process.env.MONGO_URL);
 const connection = mongoose.connection;
 connection.once("open", () => {
   console.log("MongoDB connection established successfully");
@@ -76,7 +72,6 @@ app.use("/api/inquiries", inquiryRouter);
 app.use("/api/orders", orderRouter);
 
 // ✅ START SERVER
-const PORT = process.env.PORT || 3005;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(3005, () => {
+  console.log("Server is running on port 3005");
 });
